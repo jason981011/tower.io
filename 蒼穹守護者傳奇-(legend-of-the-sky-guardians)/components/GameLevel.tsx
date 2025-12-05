@@ -1105,7 +1105,7 @@ const GameLevel: React.FC<GameLevelProps> = ({ levelId, hero, selectedTalents, o
                    <Skull size={18} /> {nextWaveCooldown > 0 ? `${(nextWaveCooldown/1000).toFixed(1)}s` : 'CALL WAVE'}
                </button>
                 <button onClick={() => setInstantWave(v => !v)} className={`ml-2 px-3 py-1 rounded border ${instantWave ? 'bg-emerald-700 text-white border-emerald-500' : 'bg-slate-700 text-slate-300 border-slate-600'}`} title="跳波一次性生成: 開/關">
-                    {instantWave ? 'Instant: ON' : 'Instant: OFF'}
+                    {instantWave ? '✓ 怪物立即出現' : '✗ 怪物立即出現'}
                 </button>
            </div>
            <div className="flex gap-4">
