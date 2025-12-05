@@ -366,10 +366,13 @@ const GameLevel: React.FC<GameLevelProps> = ({ levelId, hero, selectedTalents, o
         if (currentEnemies.length === 0 && waveStateRef.current.enemiesSpawned >= waveStateRef.current.enemiesToSpawn) {
             waveStateRef.current.waveCooldown++;
             if (waveStateRef.current.waveCooldown > 120) { 
-                newMoney += 100 + (newWave * 10); // 基於當前波次計算獎勵（修正）
+                // 波次完成獎勵計算
+                newMoney += 100 + (newWave * 10); // 基於當前波次計算獎勵
                 newWave++;
+                // 重置波次狀態
                 waveStateRef.current.enemiesSpawned = 0;
-                waveStateRef.current.enemiesToSpawn = 10 + Math.floor(newWave * 1.5);
+                waveStateRef.current.enemiesToSpawn = 10 + Math.floor(newWave * 1.5); // 使用新波次計算敵人數
+                waveStateRef.current.spawnTimer = 0; // 重置生成計時器
                 waveStateRef.current.waveCooldown = 0;
             }
         }
@@ -730,7 +733,8 @@ const GameLevel: React.FC<GameLevelProps> = ({ levelId, hero, selectedTalents, o
         });
 
         waveStateRef.current.spawnTimer++;
-        const spawnInterval = Math.max(30, 100 - (newWave * 5)); 
+        // 隨波次加速，但限制最快 30 幀（保證可控）
+        const spawnInterval = Math.max(30, 100 - (newWave * 4)); 
         
         if (waveStateRef.current.enemiesSpawned < waveStateRef.current.enemiesToSpawn && waveStateRef.current.spawnTimer > spawnInterval) {
             waveStateRef.current.spawnTimer = 0;
@@ -808,11 +812,9 @@ const GameLevel: React.FC<GameLevelProps> = ({ levelId, hero, selectedTalents, o
       if (now - lastWaveCallTime.current < 5000) return;
       lastWaveCallTime.current = now;
       setNextWaveCooldown(5000);
-      // 只重置波次狀態，不要重複給錢和增加波次（由主遊戲循環處理）
-      waveStateRef.current.enemiesSpawned = 0;
-      waveStateRef.current.enemiesToSpawn = 10 + Math.floor((gameState.wave + 1) * 1.5);
-      waveStateRef.current.spawnTimer = 0;
-      waveStateRef.current.waveCooldown = -200; // 立即開始生成敵人
+      // 手動呼叫下一波時，將 waveCooldown 設為 120 以觸發波次轉換
+      // 這樣下一次 updateGame 就會立即轉換波次
+      waveStateRef.current.waveCooldown = 121; // 超過 120 的閾值立即觸發
   };
   
   const handleMapClick = (e: React.MouseEvent<HTMLDivElement>) => {
