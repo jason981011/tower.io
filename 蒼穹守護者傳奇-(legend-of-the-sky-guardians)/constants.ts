@@ -272,7 +272,7 @@ export const ENEMIES: Record<EnemyType, EnemyDef> = {
     description: "【BOSS】虛空維度的統治者，一切災厄的源頭。它的存在本身就在扭曲周圍的空間。擁有深不可測的生命力與防禦，並能無視地形飛行。當虛空領主降臨時，天空將變為紫色，大地將會崩裂。只有最強大的英雄與全副武裝的防線才能有一線生機。",
     baseHp: 3500, // Reduced from 5000
     baseSpeed: 0.5,
-    armor: 0.6,
+    armor: 0.4,
     isFlying: true,
     reward: 500,
     visualColor: '#000000' 
@@ -325,12 +325,12 @@ export const TOWER_DEFS: Record<TowerType, TowerDef> = {
     type: TowerType.CANNON,
     name: '砲塔',
     icon: '💣',
-    t1: { name: '矮人火砲', damage: 80, range: 120, rate: 2200, cost: 140, description: '造成範圍爆炸傷害。', projectileType: ProjectileType.BOMB, splashRadius: 70 },
-    t2: { name: '重型榴彈砲', damage: 180, range: 150, rate: 2000, cost: 300, description: '更大的爆炸半徑與傷害。', projectileType: ProjectileType.BOMB, splashRadius: 100 },
+    t1: { name: '矮人火砲', damage: 60, range: 120, rate: 2200, cost: 140, description: '造成範圍爆炸傷害。', projectileType: ProjectileType.BOMB, splashRadius: 70 },
+    t2: { name: '重型榴彈砲', damage: 140, range: 150, rate: 2000, cost: 300, description: '更大的爆炸半徑與傷害。', projectileType: ProjectileType.BOMB, splashRadius: 100 },
     t3Options: [
-      { name: '特斯拉線圈', damage: 250, range: 170, rate: 1500, cost: 550, description: '連鎖閃電攻擊多個目標。', projectileType: ProjectileType.MAGIC, splashRadius: 120 },
-      { name: '貝莎巨砲', damage: 1000, range: 350, rate: 3200, cost: 600, description: '全地圖超遠程支援，毀滅性打擊。', projectileType: ProjectileType.BOMB, splashRadius: 180 },
-      { name: '戰鬥機甲', damage: 130, range: 120, rate: 600, cost: 580, description: '快速發射微型導彈風暴。', projectileType: ProjectileType.BOMB, splashRadius: 60 }
+      { name: '特斯拉線圈', damage: 200, range: 170, rate: 1500, cost: 550, description: '連鎖閃電攻擊多個目標。', projectileType: ProjectileType.MAGIC, splashRadius: 120 },
+      { name: '貝莎巨砲', damage: 750, range: 350, rate: 3200, cost: 600, description: '全地圖超遠程支援，毀滅性打擊。', projectileType: ProjectileType.BOMB, splashRadius: 180 },
+      { name: '戰鬥機甲', damage: 100, range: 120, rate: 600, cost: 580, description: '快速發射微型導彈風暴。', projectileType: ProjectileType.BOMB, splashRadius: 60 }
     ]
   },
   [TowerType.GOLD_MINE]: {

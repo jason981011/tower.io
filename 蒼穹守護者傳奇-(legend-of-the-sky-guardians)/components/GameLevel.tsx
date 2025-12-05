@@ -424,8 +424,9 @@ const GameLevel: React.FC<GameLevelProps> = ({ levelId, hero, selectedTalents, o
                 newHero.isDead = false;
                 newHero.hp = newHero.maxHp;
                 newHero.state = 'IDLE';
-                newHero.x = pathEnd.x;
-                newHero.y = pathEnd.y;
+                // 保持在當前位置，不回到終點
+                // newHero.x = pathEnd.x;
+                // newHero.y = pathEnd.y;
                 newHero.fightingEnemyId = null;
             }
         } else {
@@ -847,9 +848,9 @@ const GameLevel: React.FC<GameLevelProps> = ({ levelId, hero, selectedTalents, o
 
   const callNextWave = () => {
       const now = Date.now();
-      if (now - lastWaveCallTime.current < 5000) return; // 5秒冷卻時間
+      if (now - lastWaveCallTime.current < 3000) return; // 3秒冷卻時間
       lastWaveCallTime.current = now;
-      setNextWaveCooldown(5000);
+      setNextWaveCooldown(3000);
       
       // 直接觸發波次轉換，給予獎勵
       setGameState(prev => {
