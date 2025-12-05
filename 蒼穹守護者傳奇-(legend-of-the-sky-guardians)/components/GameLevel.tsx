@@ -809,12 +809,31 @@ const GameLevel: React.FC<GameLevelProps> = ({ levelId, hero, selectedTalents, o
 
   const callNextWave = () => {
       const now = Date.now();
-      if (now - lastWaveCallTime.current < 5000) return;
+      if (now - lastWaveCallTime.current < 5000) return; // 5秒冷卻時間
       lastWaveCallTime.current = now;
       setNextWaveCooldown(5000);
-      // 手動呼叫下一波時，將 waveCooldown 設為 120 以觸發波次轉換
-      // 這樣下一次 updateGame 就會立即轉換波次
-      waveStateRef.current.waveCooldown = 121; // 超過 120 的閾值立即觸發
+      
+      // 直接觸發波次轉換，給予獎勵
+      setGameState(prev => {
+          let newMoney = prev.money;
+          let newWave = prev.wave;
+          
+          // 立即完成當前波次：給予獎勵
+          newMoney += 100 + (newWave * 10);
+          newWave++;
+          
+          // 重置波次狀態以開始下一波
+          waveStateRef.current.enemiesSpawned = 0;
+          waveStateRef.current.enemiesToSpawn = 10 + Math.floor(newWave * 1.5);
+          waveStateRef.current.spawnTimer = 0;
+          waveStateRef.current.waveCooldown = 0;
+          
+          return {
+              ...prev,
+              money: newMoney,
+              wave: newWave
+          };
+      });
   };
   
   const handleMapClick = (e: React.MouseEvent<HTMLDivElement>) => {
