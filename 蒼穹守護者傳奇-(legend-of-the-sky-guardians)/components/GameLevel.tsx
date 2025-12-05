@@ -75,6 +75,7 @@ const GameLevel: React.FC<GameLevelProps> = ({ levelId, hero, selectedTalents, o
   const [nextWaveCooldown, setNextWaveCooldown] = useState(0); 
   const [showBestiary, setShowBestiary] = useState(false);
   const [hoveredUpgradeTier, setHoveredUpgradeTier] = useState<number | null>(null);
+    const [instantWave, setInstantWave] = useState<boolean>(true); // 新增：跳波一次性生成開關，預設 true
 
   const waveStateRef = useRef({
       enemiesSpawned: 0,
@@ -374,6 +375,43 @@ const GameLevel: React.FC<GameLevelProps> = ({ levelId, hero, selectedTalents, o
                 waveStateRef.current.enemiesToSpawn = 10 + Math.floor(newWave * 1.5); // 使用新波次計算敵人數
                 waveStateRef.current.spawnTimer = 0; // 重置生成計時器
                 waveStateRef.current.waveCooldown = 0;
+
+                // 若設定為一次性生成，則立即生成本波所有敵人（跳波時）
+                if (instantWave) {
+                    const enemyTypes = Object.values(EnemyType);
+                    for (let i = 0; i < waveStateRef.current.enemiesToSpawn; i++) {
+                    const pathId = Math.floor(Math.random() * levelConfig.paths.length);
+                    const path = levelConfig.paths[pathId];
+                    let typeIndex = 0;
+                    if (newWave > 15) typeIndex = Math.floor(Math.random() * 9);
+                    else if (newWave > 10) typeIndex = Math.floor(Math.random() * 8);
+                    else if (newWave > 5) typeIndex = Math.floor(Math.random() * 6);
+                    else typeIndex = Math.floor(Math.random() * 4);
+                    if (newWave > 0 && newWave % 5 === 0 && Math.random() > 0.7) typeIndex = 9;
+                    const def = ENEMIES[enemyTypes[typeIndex]];
+                    const scale = Math.pow(1.10, newWave - 1);
+
+                            survivingEnemies.push({
+                        id: `e_${newWave}_${Math.random()}`,
+                        defId: def.type,
+                        x: path[0].x,
+                        y: path[0].y,
+                        hp: Math.floor(def.baseHp * scale),
+                        maxHp: Math.floor(def.baseHp * scale),
+                        speed: def.baseSpeed,
+                        pathId: pathId,
+                        pathIndex: 0,
+                        isFlying: def.isFlying,
+                        freezeTime: 0,
+                        burnTime: 0,
+                        stunTime: 0,
+                        isBlocked: false,
+                        blockedBy: null
+                    });
+                    }
+                    // 標記為已生成完
+                    waveStateRef.current.enemiesSpawned = waveStateRef.current.enemiesToSpawn;
+                }
             }
         }
 
@@ -827,7 +865,44 @@ const GameLevel: React.FC<GameLevelProps> = ({ levelId, hero, selectedTalents, o
           waveStateRef.current.enemiesToSpawn = 10 + Math.floor(newWave * 1.5);
           waveStateRef.current.spawnTimer = 0;
           waveStateRef.current.waveCooldown = 0;
-          
+
+          // 若 instantWave 打開，立刻生成下一波敵人並加入狀態
+          if (instantWave) {
+              const enemyTypes = Object.values(EnemyType);
+              const newEnemies: Enemy[] = [];
+              for (let i = 0; i < waveStateRef.current.enemiesToSpawn; i++) {
+                  const pathId = Math.floor(Math.random() * levelConfig.paths.length);
+                  const path = levelConfig.paths[pathId];
+                  let typeIndex = 0;
+                  if (newWave > 15) typeIndex = Math.floor(Math.random() * 9);
+                  else if (newWave > 10) typeIndex = Math.floor(Math.random() * 8);
+                  else if (newWave > 5) typeIndex = Math.floor(Math.random() * 6);
+                  else typeIndex = Math.floor(Math.random() * 4);
+                  if (newWave > 0 && newWave % 5 === 0 && Math.random() > 0.7) typeIndex = 9;
+                  const def = ENEMIES[enemyTypes[typeIndex]];
+                  const scale = Math.pow(1.10, newWave - 1);
+                  newEnemies.push({
+                      id: `e_${newWave}_${Math.random()}`,
+                      defId: def.type,
+                      x: path[0].x,
+                      y: path[0].y,
+                      hp: Math.floor(def.baseHp * scale),
+                      maxHp: Math.floor(def.baseHp * scale),
+                      speed: def.baseSpeed,
+                      pathId: pathId,
+                      pathIndex: 0,
+                      isFlying: def.isFlying,
+                      freezeTime: 0,
+                      burnTime: 0,
+                      stunTime: 0,
+                      isBlocked: false,
+                      blockedBy: null
+                  });
+              }
+              waveStateRef.current.enemiesSpawned = waveStateRef.current.enemiesToSpawn;
+              return { ...prev, money: newMoney, wave: newWave, enemies: [...prev.enemies, ...newEnemies] };
+          }
+
           return {
               ...prev,
               money: newMoney,
@@ -1028,6 +1103,9 @@ const GameLevel: React.FC<GameLevelProps> = ({ levelId, hero, selectedTalents, o
                >
                    <Skull size={18} /> {nextWaveCooldown > 0 ? `${(nextWaveCooldown/1000).toFixed(1)}s` : 'CALL WAVE'}
                </button>
+                <button onClick={() => setInstantWave(v => !v)} className={`ml-2 px-3 py-1 rounded border ${instantWave ? 'bg-emerald-700 text-white border-emerald-500' : 'bg-slate-700 text-slate-300 border-slate-600'}`} title="跳波一次性生成: 開/關">
+                    {instantWave ? 'Instant: ON' : 'Instant: OFF'}
+                </button>
            </div>
            <div className="flex gap-4">
               <button onClick={() => setShowBestiary(true)} className="p-2 bg-slate-700 rounded hover:bg-slate-600 text-amber-300 pointer-events-auto" title="圖鑑">
